@@ -1,0 +1,21 @@
+import { test, expect } from '@playwright/test'
+
+test('mobile chat navigation, keyboard dialog and responsive layout', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile')
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: 'Подключите аккаунт' })).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.getByRole('button', { name: 'Открыть демоверсию' }).click()
+  await expect(page.getByRole('textbox', { name: 'Текст сообщения' })).toBeVisible()
+  await page.getByRole('button', { name: 'Назад к чатам' }).click()
+  await expect(page.getByRole('heading', { name: /Сообщения/ })).toBeVisible()
+  await page.getByRole('button', { name: 'Новый чат', exact: true }).click()
+  await page.getByLabel('Номер телефона или @username').fill('@test_user')
+  await page.getByRole('button', { name: 'Начать разговор' }).click()
+  await expect(page.getByRole('heading', { name: '@test_user' })).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.getByRole('button', { name: 'Информация о подключении' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+})
